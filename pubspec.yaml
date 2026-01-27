@@ -1,6 +1,6 @@
 name: text_field_custom
 description: In this package I have customized the textformfield for easy use.
-version: 0.0.2
+version: 0.0.3
 repository: https://github.com/harshitAmar/text_field_custom.git
 
 environment:
