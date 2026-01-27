@@ -66,8 +66,7 @@ class _DemoPageState extends State<DemoPage> {
                     controller: nameController,
                     isRequired: true,
                     border: border,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? "Name is required" : null,
+                    validator: Validations.nameValidation,
                   ),
                   TextFieldCustom(
                     title: "Email",
@@ -75,11 +74,7 @@ class _DemoPageState extends State<DemoPage> {
                     controller: emailController,
                     keyboardType: TextInputType.emailAddress,
                     border: border,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return "Email is required";
-                      if (!v.contains("@")) return "Invalid email";
-                      return null;
-                    },
+                    validator: Validations.emailValidation,
                   ),
                 ],
               ),
@@ -91,6 +86,7 @@ class _DemoPageState extends State<DemoPage> {
                     hintText: "Enter password",
                     controller: passwordController,
                     obscureText: true,
+                    validator: Validations.passwordValidation,
                     border: border,
                   ),
                   TextFieldCustom(
@@ -98,6 +94,7 @@ class _DemoPageState extends State<DemoPage> {
                     hintText: "Enter phone number",
                     controller: phoneController,
                     keyboardType: TextInputType.phone,
+                    validator: Validations.phoneValidation,
                     maxLength: 10,
                     border: border,
                     inputFormatters: [

@@ -198,7 +198,15 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.0.2"
+  validation_helper:
+    dependency: transitive
+    description:
+      name: validation_helper
+      sha256: "2d77d1c45d082c06dc29c5c81ccec3cb64d41cc75c78ae8191ca8e8ebc29d033"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   vector_math:
     dependency: transitive
     description:
@@ -216,5 +224,5 @@ packages:
     source: hosted
     version: "14.3.1"
 sdks:
-  dart: ">=3.7.0-0 <4.0.0"
+  dart: ">=3.7.0 <4.0.0"
   flutter: ">=3.18.0-18.0.pre.54"
