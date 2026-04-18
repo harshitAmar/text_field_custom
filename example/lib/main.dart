@@ -6,6 +6,7 @@ void main() {
   runApp(const MyApp());
 }
 
+/// Root App
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -14,41 +15,75 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'TextFieldCustom Demo',
       debugShowCheckedModeBanner: false,
+
+      /// 🌞 Light Theme
       theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.indigo,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        extensions: [
+          TextFieldCustomTheme(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            fillColor: const Color(0xFFF5F5F5),
+            filled: true,
+            textStyle: const TextStyle(fontSize: 14),
+            hintStyle: const TextStyle(color: Colors.grey),
+            titleStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
-      home: const DemoPage(),
+
+      /// 🌙 Dark Theme
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        extensions: [
+          TextFieldCustomTheme(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            fillColor: Colors.grey.shade900,
+            filled: true,
+            textStyle: const TextStyle(color: Colors.white),
+            hintStyle: const TextStyle(color: Colors.grey),
+            titleStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+
+      themeMode: ThemeMode.system,
+
+      home: const DemoScreen(),
     );
   }
 }
 
-class DemoPage extends StatefulWidget {
-  const DemoPage({super.key});
+/// Demo Screen
+class DemoScreen extends StatefulWidget {
+  const DemoScreen({super.key});
 
   @override
-  State<DemoPage> createState() => _DemoPageState();
+  State<DemoScreen> createState() => _DemoScreenState();
 }
 
-class _DemoPageState extends State<DemoPage> {
+class _DemoScreenState extends State<DemoScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final nameController = TextEditingController();
   final emailController = TextEditingController();
-  final phoneController = TextEditingController();
   final passwordController = TextEditingController();
-  final searchController = TextEditingController();
 
-  InputBorder get border => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(width: 1.2),
-      );
+  bool obscure = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("TextFieldCustom Example"),
+        title: const Text('TextFieldCustom Demo'),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -57,163 +92,103 @@ class _DemoPageState extends State<DemoPage> {
           key: _formKey,
           child: Column(
             children: [
-              _section(
-                title: "Basic Fields",
-                children: [
-                  TextFieldCustom(
-                    title: "Full Name",
-                    hintText: "Enter your name",
-                    controller: nameController,
-                    isRequired: true,
-                    border: border,
-                    validator: Validations.nameValidation,
-                  ),
-                  TextFieldCustom(
-                    title: "Email",
-                    hintText: "Enter your email",
-                    controller: emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    border: border,
-                    validator: Validations.emailValidation,
-                  ),
-                ],
+              /// 📧 Email Field
+              TextFieldCustom(
+                title: "Email",
+                hintText: "Enter your email",
+                controller: emailController,
+                isRequired: true,
+                keyboardType: TextInputType.emailAddress,
+                validator: Validations.emailValidation,
+                prefix: const Icon(Icons.email),
               ),
-              _section(
-                title: "Security & Input Control",
-                children: [
-                  TextFieldCustom(
-                    title: "Password",
-                    hintText: "Enter password",
-                    controller: passwordController,
-                    obscureText: true,
-                    validator: Validations.passwordValidation,
-                    border: border,
+
+              const SizedBox(height: 20),
+
+              /// 🔒 Password Field
+              TextFieldCustom(
+                title: "Password",
+                hintText: "Enter your password",
+                controller: passwordController,
+                obscureText: obscure,
+                isRequired: true,
+                validator: Validations.passwordValidation,
+                prefix: const Icon(Icons.lock),
+                suffix: IconButton(
+                  icon: Icon(
+                    obscure ? Icons.visibility : Icons.visibility_off,
                   ),
-                  TextFieldCustom(
-                    title: "Phone",
-                    hintText: "Enter phone number",
-                    controller: phoneController,
-                    keyboardType: TextInputType.phone,
-                    validator: Validations.phoneValidation,
-                    maxLength: 10,
-                    border: border,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
-                  ),
-                ],
-              ),
-              _section(
-                title: "Advanced Usage",
-                children: [
-                  TextFieldCustom(
-                    title: "Date of Birth",
-                    hintText: "Select date",
-                    readOnly: true,
-                    border: border,
-                    suffix: const Icon(Icons.calendar_month),
-                    onTap: () async {
-                      await showDatePicker(
-                        context: context,
-                        firstDate: DateTime(1990),
-                        lastDate: DateTime.now(),
-                        initialDate: DateTime.now(),
-                      );
-                    },
-                  ),
-                  TextFieldCustom(
-                    title: "Search",
-                    hintText: "Search product",
-                    controller: searchController,
-                    border: border,
-                    prefix: const Icon(Icons.search),
-                    suffix: const Icon(Icons.mic),
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (v) {},
-                  ),
-                ],
-              ),
-              _section(
-                title: "UI Variants",
-                children: [
-                  TextFieldCustom(
-                    title: "Description",
-                    hintText: "Enter description",
-                    maxLines: 4,
-                    border: border,
-                  ),
-                  TextFieldCustom(
-                    title: "Filled Field",
-                    hintText: "Styled input",
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    border: border,
-                  ),
-                  TextFieldCustom(
-                    title: "Read Only",
-                    initialValue: "USR_204984",
-                    onlyText: true,
-                    border: border,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: FilledButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Form validated")),
-                      );
-                    }
+                    setState(() {
+                      obscure = !obscure;
+                    });
                   },
-                  child: const Text("Submit Form"),
                 ),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// 📱 Phone Field (with formatter)
+              TextFieldCustom(
+                title: "Phone Number",
+                hintText: "Enter phone number",
+                keyboardType: TextInputType.number,
+                validator: Validations.phoneValidation,
+                maxLength: 10,
+                inputFormatters: [
+                  // digits only
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                prefix: const Icon(Icons.phone),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// 📝 Multiline Field
+              const TextFieldCustom(
+                title: "Address",
+                hintText: "Enter your address",
+                validator: Validations.fieldValidation,
+                maxLines: 3,
+                prefix: Icon(Icons.home),
+              ),
+
+              const SizedBox(height: 20),
+
+              /// 🔒 Readonly Field
+              const TextFieldCustom(
+                title: "Readonly Field",
+                hintText: "You cannot edit this",
+                readOnly: true,
+                initialValue: "Fixed Value",
+              ),
+
+              const SizedBox(height: 20),
+
+              /// 🎯 Local Override Example
+              const TextFieldCustom(
+                title: "Custom Styled Field",
+                hintText: "Overrides theme",
+                filled: false,
+                border: UnderlineInputBorder(),
+              ),
+
+              const SizedBox(height: 30),
+
+              /// ✅ Submit Button
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text("Form Valid ✅")),
+                    );
+                  }
+                },
+                child: const Text("Submit"),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _section({
-    required String title,
-    required List<Widget> children,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 10,
-            color: Colors.black.withOpacity(0.05),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          ...children.map(
-            (e) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: e,
-            ),
-          ),
-        ],
       ),
     );
   }

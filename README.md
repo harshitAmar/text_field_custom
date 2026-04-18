@@ -1,28 +1,30 @@
-
+ 
 # 📦 text_field_custom
 
-A **highly customizable, reusable, and production-ready Flutter text field widget** with built-in support for titles, validation, borders, icons, formatting, read-only mode, and many UI configurations.
+A **highly customizable, reusable, and production-ready Flutter text field widget** with built-in support for titles, validation, theming, borders, icons, formatting, and more.
 
-Designed to **reduce boilerplate**, **improve consistency**, and **speed up form development** across Flutter projects.
+Designed to **reduce boilerplate**, **ensure UI consistency**, and **accelerate form development** across Flutter apps.
 
 ---
 
 ## ✨ Features
 
-* ✅ Optional title with required indicator
+* ✅ Optional title with required indicator (*)
 * ✅ Built-in validation support
-* ✅ Supports prefix & suffix widgets
-* ✅ Supports readonly & disabled fields
-* ✅ Supports filled & outlined styles
-* ✅ Supports formatters, maxLength, multiline
-* ✅ Supports keyboard actions & focus control
-* ✅ Clean, reusable & production-ready API
+* ✅ Prefix & suffix widget support
+* ✅ Read-only, disabled & view-only modes
+* ✅ Filled, outlined & custom border styles
+* ✅ Input formatters, maxLength, multiline support
+* ✅ Keyboard actions & focus control
+* ✅ 🌗 **Dark & Light theme support (ThemeExtension)**
+* ✅ 🎨 **Global styling via ThemeData**
+* ✅ ⚡ Clean, scalable & production-ready API
 
 ---
 
 ## 📸 Preview
 
-> You can add screenshots here later from the example app.
+> Add screenshots or GIFs from `/example` for better engagement.
 
 ---
 
@@ -32,7 +34,7 @@ Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  text_field_custom: ^1.0.0
+  text_field_custom: ^2.0.0
 ```
 
 Then run:
@@ -47,11 +49,69 @@ flutter pub get
 
 ```dart
 import 'package:text_field_custom/text_field_custom.dart';
+import 'package:text_field_custom/text_field_custom_theme.dart';
 ```
 
 ---
 
-## 🧱 Basic Usage
+# 🧠 Theming (NEW 🚀)
+
+You can now configure **global styles using ThemeExtension**.
+
+## 🔥 Setup in `main.dart`
+
+```dart
+MaterialApp(
+  theme: ThemeData(
+    extensions: [
+      TextFieldCustomTheme(
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        fillColor: Color(0xFFF5F5F5),
+        filled: true,
+        textStyle: TextStyle(fontSize: 14),
+        hintStyle: TextStyle(color: Colors.grey),
+        titleStyle: TextStyle(
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+        ),
+      ),
+    ],
+  ),
+);
+```
+
+---
+
+## 🌙 Dark Theme Support
+
+```dart
+darkTheme: ThemeData(
+  brightness: Brightness.dark,
+  extensions: [
+    TextFieldCustomTheme(
+      fillColor: Colors.grey.shade900,
+      textStyle: TextStyle(color: Colors.white),
+      hintStyle: TextStyle(color: Colors.grey),
+    ),
+  ],
+),
+```
+
+---
+
+## 🎯 Styling Priority
+
+```text
+Widget parameter > ThemeExtension > Default values
+```
+
+This gives you **full flexibility + global consistency**.
+
+---
+
+# 🧱 Basic Usage
 
 ```dart
 TextFieldCustom(
@@ -68,7 +128,7 @@ TextFieldCustom(
 
 ---
 
-## 🧩 Usage Examples
+# 🧩 Usage Examples
 
 ---
 
@@ -174,17 +234,27 @@ TextFieldCustom(
 
 ---
 
+### 9️⃣ Override Global Theme Locally
+
+```dart
+TextFieldCustom(
+  title: "Custom Field",
+  filled: false,
+  border: UnderlineInputBorder(),
+)
+```
+
+---
+
 ## 🧪 Example App
 
-A complete example app is available in the:
+A complete working example is available in:
 
 ```
 /example
 ```
 
-folder.
-
-Run it using:
+Run it:
 
 ```bash
 cd example
@@ -224,6 +294,7 @@ flutter run
 
 * 🚀 Reduces repetitive UI code
 * 🎯 Standardizes form UI across apps
+* 🎨 Centralized theming support
 * 🧼 Clean and scalable architecture
 * 📦 Easy to maintain and extend
 
@@ -231,7 +302,8 @@ flutter run
 
 ## 🛣️ Roadmap
 
-* [ ] Theme presets
+* [ ] Field variants (outlined / filled / borderless)
+* [ ] Size system (small / medium / large)
 * [ ] Built-in password toggle
 * [ ] SearchField / DateField variants
 * [ ] Form builder helpers
@@ -254,3 +326,4 @@ Senior Flutter Developer
 ## 📄 License
 
 MIT License
+ 

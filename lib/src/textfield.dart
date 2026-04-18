@@ -4,15 +4,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// A highly customizable reusable TextFormField widget.
+import 'text_field_custom_theme.dart';
+
+/// A highly customizable reusable `TextFormField` widget.
 ///
-/// Features:
-/// - Optional title with required indicator
-/// - Supports validation, formatting, prefix/suffix widgets
-/// - Supports readonly, disabled, and text-only modes
-/// - Configurable styles, borders, padding, and keyboard behavior
+/// ## ✨ Features
+/// - Optional title with required indicator (*)
+/// - Built-in validation support
+/// - Prefix & suffix widget support
+/// - Supports read-only, disabled, and text-only modes
+/// - Fully customizable borders, styles, and layout
+/// - Integrated with [TextFieldCustomTheme] via ThemeExtension
 ///
-/// Example:
+/// ## 🎯 Styling Priority
+/// Styling is applied in the following order:
+/// ```
+/// Widget parameter > ThemeExtension > Default values
+/// ```
+///
+/// ## 📌 Example
 /// ```dart
 /// TextFieldCustom(
 ///   title: "Email",
@@ -22,95 +32,114 @@ import 'package:flutter/services.dart';
 /// )
 /// ```
 class TextFieldCustom extends StatelessWidget {
-  /// Placeholder text
+  /// Placeholder text shown inside the input field
   final String? hintText;
 
-  /// Validation function
+  /// Validation function for form validation
   final String? Function(String?)? validator;
 
-  /// Text controller
+  /// Controller to manage text input
+  /// Cannot be used together with [initialValue]
   final TextEditingController? controller;
 
-  /// Field title shown above input
+  /// Title displayed above the input field
   final String? title;
 
-  /// Obscure text (for password fields)
+  /// If true, hides the text (useful for passwords)
   final bool obscureText;
 
-  /// Style for title text
+  /// Custom style for the title text
   final TextStyle? titleStyle;
 
-  /// Style for input text & hint
+  /// Custom style for hint text
   final TextStyle? hintStyle;
 
-  /// Makes field readonly
+  /// Makes the field read-only (user cannot edit but can tap)
   final bool readOnly;
 
-  /// Disables the field completely
+  /// Enables or disables the field completely
   final bool enabled;
 
-  /// Tap callback
+  /// Callback when the field is tapped
   final VoidCallback? onTap;
 
-  /// Change callback
+  /// Callback triggered when text changes
   final Function(String)? onChanged;
 
-  /// Submit callback
+  /// Callback triggered when user submits input (done/enter)
   final Function(String)? onSubmitted;
 
-  /// Input border
+  /// Base border for the input field
   final InputBorder? border;
 
-  /// Initial value
+  /// Initial value of the field (used when controller is null)
   final String? initialValue;
 
-  /// Shows red star if true
+  /// If true, shows a red star (*) next to the title
   final bool isRequired;
 
-  /// Auto validation mode
+  /// Auto validation behavior
   final AutovalidateMode? autovalidateMode;
 
-  /// Input formatters
+  /// Input formatters (e.g., digits only, uppercase)
   final List<TextInputFormatter>? inputFormatters;
 
-  /// Max length
+  /// Maximum allowed character length
   final int? maxLength;
 
-  /// Prefix widget
+  /// Widget displayed before the input (icon/text)
   final Widget? prefix;
 
-  /// Suffix widget
+  /// Widget displayed after the input (icon/text)
   final Widget? suffix;
 
-  /// Text color
+  /// Optional text color override
   final Color? textColor;
 
-  /// Background color
+  /// Background color when [filled] is true
   final Color? fillColor;
 
-  /// Whether field is filled
+  /// Whether the input field has a filled background
   final bool filled;
 
-  /// Max lines
+  /// Maximum number of lines (for multiline input)
   final int? maxLines;
 
-  /// Bottom spacing
+  /// Bottom spacing after the field
   final double padding;
 
-  /// Keyboard type
+  /// Keyboard type (text, number, email, etc.)
   final TextInputType? keyboardType;
 
-  /// Keyboard action
+  /// Keyboard action button (next, done, etc.)
   final TextInputAction? textInputAction;
 
-  /// Focus node
+  /// Focus node for managing focus state
   final FocusNode? focusNode;
 
-  /// If true, field becomes text-only (disabled)
+  /// If true, disables editing and behaves like plain text
   final bool onlyText;
 
+  /// Custom text style for input text
+  final TextStyle? style;
+
+  /// Border when validation error occurs
+  final InputBorder? errorBorder;
+
+  /// Border when field is focused
+  final InputBorder? focusedBorder;
+
+  /// Border when focused and error occurs
+  final InputBorder? focusedErrorBorder;
+
+  /// Border when field is disabled
+  final InputBorder? disabledBorder;
+
+  /// Border when field is enabled
+  final InputBorder? enabledBorder;
+
   const TextFieldCustom({
-    Key? key,
+    super.key,
     this.border,
     this.controller,
     this.titleStyle,
@@ -140,80 +169,170 @@ class TextFieldCustom extends StatelessWidget {
     this.onlyText = false,
     this.filled = false,
     this.fillColor,
-  }) : super(key: key);
+    this.style,
+    this.errorBorder,
+    this.focusedBorder,
+    this.focusedErrorBorder,
+    this.disabledBorder,
+    this.enabledBorder,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        padding: const EdgeInsets.all(4.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (title != null)
-              Row(
-                children: [
-                  Text(
-                    title!,
-                    style: titleStyle ??
-                        TextStyle(
-                          color: textColor,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                  ),
-                  if (isRequired)
-                    const Padding(
-                      padding: EdgeInsets.only(left: 4),
-                      child: Icon(
-                        CupertinoIcons.staroflife_fill,
-                        color: Colors.red,
-                        size: 8,
+    /// 🔥 Fetch ThemeExtension (if provided in ThemeData)
+    final theme = Theme.of(context).extension<TextFieldCustomTheme>();
+
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.all(4.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 📌 Title Section (optional)
+          if (title != null)
+            Row(
+              children: [
+                Text(
+                  title!,
+
+                  /// Priority: Widget > Theme > Default
+                  style:
+                      titleStyle ??
+                      theme?.titleStyle ??
+                      TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
                       ),
-                    )
-                ],
-              ),
-            const SizedBox(height: 10),
-            TextFormField(
-              focusNode: focusNode,
-              enabled: enabled && !onlyText,
-              readOnly: readOnly,
-              initialValue: initialValue,
-              controller: controller,
-              autovalidateMode: autovalidateMode,
-              inputFormatters: inputFormatters,
-              maxLength: maxLength,
-              onChanged: onChanged,
-              onFieldSubmitted: onSubmitted,
-              keyboardType: keyboardType,
-              textInputAction: textInputAction,
-              maxLines: maxLines,
-              obscureText: obscureText,
-              validator: validator,
-              style: hintStyle ??
-                  const TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
-              decoration: InputDecoration(
-                counterText: "",
-                filled: filled,
-                fillColor: fillColor,
-                prefixIcon: prefix,
-                suffixIcon: suffix,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-                hintText: hintText,
-                hintStyle: hintStyle ??
-                    const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
-                border: border ??
-                    const UnderlineInputBorder(
-                      borderSide: BorderSide(width: 1.5),
+                ),
+
+                /// Required indicator (*)
+                if (isRequired)
+                  const Padding(
+                    padding: EdgeInsets.only(left: 4),
+                    child: Icon(
+                      CupertinoIcons.staroflife_fill,
+                      color: Colors.red,
+                      size: 8,
                     ),
-              ),
+                  ),
+              ],
             ),
-            SizedBox(height: padding),
-          ],
-        ),
+
+          const SizedBox(height: 10),
+
+          /// ✏️ Input Field
+          TextFormField(
+            focusNode: focusNode,
+            onTap: onTap,
+
+            /// Disable if either `enabled` is false OR `onlyText` is true
+            enabled: enabled && !onlyText,
+
+            readOnly: readOnly,
+            initialValue: initialValue,
+            controller: controller,
+            autovalidateMode: autovalidateMode,
+            inputFormatters: inputFormatters,
+            maxLength: maxLength,
+            onChanged: onChanged,
+            onFieldSubmitted: onSubmitted,
+            keyboardType: keyboardType,
+            textInputAction: textInputAction,
+            maxLines: maxLines,
+            obscureText: obscureText,
+            validator: validator,
+
+            /// Text Style (priority applied)
+            style:
+                style ??
+                theme?.textStyle ??
+                const TextStyle(fontWeight: FontWeight.normal, fontSize: 16),
+
+            decoration: InputDecoration(
+              counterText: "", // hides maxLength counter
+              /// Background fill
+              filled: filled || (theme?.filled ?? false),
+              fillColor: fillColor ?? theme?.fillColor,
+
+              /// Prefix & suffix widgets
+              prefixIcon: prefix,
+              suffixIcon: suffix,
+
+              /// Inner padding
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 12,
+              ),
+
+              hintText: hintText,
+
+              /// Hint style (priority applied)
+              hintStyle:
+                  hintStyle ??
+                  theme?.hintStyle ??
+                  const TextStyle(fontWeight: FontWeight.w500, fontSize: 16),
+
+              enabled: enabled,
+
+              /// 🎯 Borders (priority applied)
+              enabledBorder:
+                  enabledBorder ??
+                  theme?.enabledBorder ??
+                  border ??
+                  theme?.border ??
+                  const UnderlineInputBorder(
+                    borderSide: BorderSide(width: 1.5),
+                  ),
+
+              focusedBorder:
+                  focusedBorder ??
+                  theme?.focusedBorder ??
+                  border ??
+                  theme?.border ??
+                  const UnderlineInputBorder(
+                    borderSide: BorderSide(width: 1.5),
+                  ),
+
+              errorBorder:
+                  errorBorder ??
+                  theme?.errorBorder ??
+                  border ??
+                  theme?.border ??
+                  const UnderlineInputBorder(
+                    borderSide: BorderSide(width: 1.5),
+                  ),
+
+              focusedErrorBorder:
+                  focusedErrorBorder ??
+                  theme?.focusedErrorBorder ??
+                  border ??
+                  theme?.border ??
+                  const UnderlineInputBorder(
+                    borderSide: BorderSide(width: 1.5),
+                  ),
+
+              disabledBorder:
+                  disabledBorder ??
+                  theme?.disabledBorder ??
+                  border ??
+                  theme?.border ??
+                  const UnderlineInputBorder(
+                    borderSide: BorderSide(width: 1.5),
+                  ),
+
+              border:
+                  border ??
+                  theme?.border ??
+                  const UnderlineInputBorder(
+                    borderSide: BorderSide(width: 1.5),
+                  ),
+            ),
+          ),
+
+          /// Bottom spacing
+          SizedBox(height: padding),
+        ],
       ),
     );
   }
